@@ -2,19 +2,74 @@
 <html lang="en">
 <head>
     <title>Hello World!</title>
+    <style>
+        body {
+            background-color: blueviolet;
+            font-family: Verdana, sans-serif;
+            margin: 0;
+            padding: 1rem;
+            color: white; /* improves contrast on purple background */
+        }
+
+        a.skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+        }
+
+        a.skip-link:focus {
+            top: 0;
+        }
+
+        header, main {
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        a {
+            color: #ffff66; /* high contrast yellow link */
+        }
+    </style>
 </head>
 
+<body>
 
-<body style="background-color: blueviolet;">
+    <a href="#main" class="skip-link">Skip to main content</a>
 
-    <h1 style="font-family:verdana; font-size:60px;">Enhancing Web App</h1>
-    <h2 style="font-size: 30px;"><b>Using attributes, links, images, headings, and paragraphs</b></h2>
-    <p style="color:red; text-align: center;">
-        I enjoyed learning about HTML basics this week.<br> 
-        <i>I look forward to improving my knowledge throughout the rest of this module.</i>  </p>
-        
-    <img src="https://www.w3schools.com/images/w3schools_green.jpg" alt="W3Schools Logo" width="104" height="142"><br>
-    <a href="https://www.w3schools.com">This is a link to further information.</a>
+    <header>
+        <h1>Enhancing Web App</h1>
+        <h2><b>Using attributes, links, images, headings, and paragraphs</b></h2>
+    </header>
+
+    <main id="main">
+        <p>
+            I enjoyed learning about HTML basics this week.<br>
+            <i>I look forward to improving my knowledge throughout the rest of this module.</i>
+        </p>
+
+        <img src="https://www.w3schools.com/images/w3schools_green.jpg"
+             alt="W3Schools Logo"
+             width="104" height="142">
+
+        <p>
+            <a href="https://www.w3schools.com">Learn more at W3Schools</a>
+        </p>
+    </main>
 
 </body>
 </html>
+
