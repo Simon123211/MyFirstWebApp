@@ -151,6 +151,70 @@
 
     </main>
 
+<script>
+// 1. Simple greeting using variables, strings, and output
+
+let userName = "Visitor";
+document.addEventListener("DOMContentLoaded", () => {
+    const greeting = document.createElement("p");
+    greeting.textContent = "Hello" + userName + "! Welcome to my enhanced web app."
+    greeting.style.textAlign = "center";
+    document.getElementById("main").appendChild(greeting);
+});
+
+// 2. Button that changes background colour (functions and events)
+function changeColour() {
+    document.body.style.backgroundColor =
+        document.body.style.backgroundColor === "blueviolet" ? "darkslateblue" : "blueviolet";
+}
+
+// Create the button dynamically
+const colourButton = document.createElement("button");
+colourButton.textContent = "Change Background Colour";
+colourButton.style.display = "block";
+colourButton.style.margin = "20px auto";
+colourButton.onclick = changeColour;
+document.getElementById("main").appendChild(colourButton);
+
+// 3. Timer showing how long user has been on page (timers and variables)
+let seconds = 0;
+
+const timerDisplay = document.createElement("p");
+timerDisplay.style.textAlign ="center";
+document.getElementById("main").appendChild(timerDisplay);
+
+setInterval(() => {
+    seconds++;
+    timerDisplay.textContent = "Time on page: " + seconds + " seconds";
+}, 1000);
+
+
+// 4. Display list using arrays + loops
+const cars = ["Volvo", "Saab", "Fiat", "BMW", "Audi"];
+const carList = document.createElement("ul");
+
+for (let i = 0; i < cars.length; i++) {
+    const item = document.createElement("li");
+    item.textContent = cars[i];
+    carList.appendChild(item);
+}
+
+document.getElementById("main").appendChild(carList);
+
+// 5. Simple form validation (if conditions and errors)
+const form = document.querySelector("form");
+
+form.addEventListener("submit", function(event) {
+    const name = document.getElementById("fname").value;
+    const email = document.getElementById("email").value;
+
+    if (name === "" || email === "") {
+        event.preventDefault();
+        alert("Error: Please fill in both your name and email.");
+    }
+});
+</script>
+
 </body>
 </html>
 
