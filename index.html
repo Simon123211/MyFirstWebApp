@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Hello World!</title>
 
     <!--Responsive viewport-->
@@ -67,6 +68,50 @@
             color: #ffff66; /* high contrast yellow link */
         }
 
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        /* Classes added/removed with JavaScript (classList) */
+        .highlight {
+            background-color: #ffff66;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .done {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .error {
+            background-color: #b00020;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        #dom-demo {
+            border: 2px solid white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        #task-list li {
+            cursor: pointer;
+            margin: 4px 0;
+        }
+
+        #task-list li button {
+            display: inline-block;
+            margin: 0 0 0 10px;
+            padding: 2px 6px;
+        }
+
+
         /* MEDIA QUERIES FOR RESPONSIVE DESIGN */
 
         /* Tablet layout (601px-900px) */
@@ -75,7 +120,7 @@
                 font-size: 2.3rem;
             }
             h2 {
-                font-size: 1,4 rem;
+                font-size: 1.4rem;
             }
             body {
                 padding: 2rem;
@@ -85,10 +130,10 @@
         /* Desktop layout (900px+) */
         @media only screen and (min-width: 901px) {
             h1 {
-                font-size: 2.5 rem;
+                font-size: 2.5rem;
             }
             h2 {
-                font-size: 1.6 rem;
+                font-size: 1.6rem;
             }
             main {
                 padding: 2rem;
@@ -139,13 +184,32 @@
                     <option value="volvo">Volvo</option>
                     <option value="saab">Saab</option>
                     <option value="fiat">Fiat</option>
-                </select><br><br>
+                </select><br>
+                <span id="car-choice"></span><br><br>
 
                 <label for="message">Your message:</label><br>
-                <textarea id="message" name="message" rows="4" cols="30"></textarea><br>
+                <textarea id="message" name="message" rows="4" cols="30" maxlength="200"></textarea><br>
+                <span id ="char-count">0 / 200 characters</span><br><br>
 
                 <input type="submit" value="Send">
             </form>
+        </section>
+
+        <!-- DOM METHODS DEMO SECTION -->
+        <section id ="dom-demo">
+            <h2> DOM Methods demo: Study Task List</h2>
+            <p id="task-count">You have 0 tasks.</p>
+
+            <label for="task-input">New task:</label><br>
+            <input typ="text" id="task-input" placeholder="e.g. Revise DOM methods">
+
+            <button type="button" id="add-task">Add tasks (bottom of list)</button>
+            <button type="button" id="add-urgent">Add urgent task (top of list)</button>
+
+            <p><i>Click a task to mark it as done.</i></p>
+            <ul id="task-list"></ul>
+
+            <button type="button" id="clear-done">Remove completed tasks</button>
         </section>
 
 
@@ -157,7 +221,7 @@
 let userName = "Visitor";
 document.addEventListener("DOMContentLoaded", () => {
     const greeting = document.createElement("p");
-    greeting.textContent = "Hello" + userName + "! Welcome to my enhanced web app."
+    greeting.textContent = "Hello " + userName + "! Welcome to my enhanced web app.";
     greeting.style.textAlign = "center";
     document.getElementById("main").appendChild(greeting);
 });
@@ -165,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // 2. Button that changes background colour (functions and events)
 function changeColour() {
     document.body.style.backgroundColor =
-        document.body.style.backgroundColor === "blueviolet" ? "darkslateblue" : "blueviolet";
+        document.body.style.backgroundColor === "darkslateblue" ? "blueviolet" : "darkslateblue";
 }
 
 // Create the button dynamically
@@ -205,14 +269,147 @@ document.getElementById("main").appendChild(carList);
 const form = document.querySelector("form");
 
 form.addEventListener("submit", function(event) {
-    const name = document.getElementById("fname").value;
-    const email = document.getElementById("email").value;
+    const name = document.getElementById("fname").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    // Remove any old error message before checking again
+    const oldError = document.getElementById("form-error");
+    if (oldError) {
+        oldError.remove();
+    }
 
     if (name === "" || email === "") {
         event.preventDefault();
-        alert("Error: Please fill in both your name and email.");
+        
+        const errorMsg = document.createElement("p");
+        errorMsg.id = "form-error";
+        errorMsg.classList.add("error");
+        errorMsg.textContent = "Error: Please fill in both your name and email.";
+        form.insertBefore(errorMsg, form.firstChild); // puts error at top of the form
     }
 });
+
+/* HTML DOM Methods */
+
+// Find every link except the skip link and makes each open safely in a new tab.
+const externalLinks = document.querySelectorAll("a:not(.skip-link)");
+externalLinks.forEach(link => {
+    link.setAttribute("target", "_blanl");
+    link.setAttribute("rel", "noopener noreferrer"); // security stops new tab controlling this page
+});
+
+// getAttribute() + setAttribute() on the image
+const logo = document.querySelector("img");
+const sizeButton = document.createElement("button");
+sizeButton.type = "button";
+sizeButton.textContent = "Enlarge image";
+
+logo.parentNode.insertBefore(sizeButton, logo.nextSibling);
+
+sizeButton.addEventListener("click", () => {
+    const currentWidth = Number(logo.getAttribute("width"));
+
+    if (currentWidth === 104) {
+        logo.setAttribute("width", "208");
+        logo.setAttribute("alt", "W3Schools Logo (enlarged)");
+        sizeButton.textContent = "Enlarge image";
+    }
+});
+
+// "Change" event + innerHTML + classList.toggle()
+const carSelect = document.getElementById("car");
+const carChoice = document.getElementById("car-choice");
+
+carSelect.addEventListener("change", () => {
+    const chosenText = carSelect.options[carSelect.selectedIndex].text;
+
+    carChoice.innerHTML = "You choose: <strong>" + chosenText + "</strong";
+
+    for (const item of carList.children) {
+        item.classList.toggle("highlight", item.textContent === chosenText);
+    }
+});
+
+// "input" event + textContent: live character counter
+const messageBox = document.getElementById("message");
+const charCount = document.getElementById("char-count");
+
+messageBox.addEventListener("input", () => {
+    charCount.textContent = messageBox.value.length + " / 200 characters";
+});
+
+// Study task list: creating, inserting, changing and removing elements
+const taskInput = document.getElementById("task-input");
+const taskList = document.getElementById("task-list");
+const taskCount = document.getElementById("task-count");
+
+const taskItems = taskList.getElementsByTagName("li");
+
+function updateTaskCount() {
+    const doneCount = taskList.getElementsByClassName("done").length;
+    taskCount.textContent = "You have " + taskItems.length + " tasks (" + doneCount + " completed).";
+}
+
+function createTask(text) {
+    const li = document.createElement("li");
+
+    li.appendChild(document.createTextNode(text));
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type - "button";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.setAttribute("aria-label", "Delete tasks: " + text); 
+    li.appendChild(deleteBtn);
+
+    return li;
+}
+
+function addTask(atTop) {
+    const text = taskInput.value.trim();
+    if (text === "") {
+        taskInput.focus();
+        return;
+    }
+
+    const newTask = createTask(text);
+
+    if (atTop) {
+        taskList.insertBefore(newTask, taskList.firstChild);
+    } else {
+    taskList.appendChild(newTask);
+    }
+
+    taskInput.value = "";
+    updateTaskCount();
+}
+
+document.getElementById("add-task").addEventListener("click", () => addTask(false));
+document.getElementById("add-urgent").addEventListener("click", () => addTask(true));
+
+taskInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        addTask(false);
+    }
+});
+
+// Event delegation: One listener on the <ul> handles clicks on every task
+taskList.addEventListener("click", (event) => {
+    if (event.target.tagName === "BUTTON") {
+        const li = event.target.parentNode;
+        taskList.removeChild(li);
+    } else if (event.target.tagName === "LI") {
+        event.target.classList.toggle("done");
+    }
+    updateTaskCount();
+});
+
+document.getElementById("clear-done").addEventListener("click", () => {
+    taskList.querySelectorAll(".done").forEach(task => task.remove());
+    updateTaskCount();
+});
+
+updateTaskCount
+
 </script>
 
 </body>
