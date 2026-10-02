@@ -111,6 +111,22 @@
             padding: 2px 6px;
         }
 
+        #quote-section {
+            border: 2px solid white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        #quote-text {
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        #quote-author {
+            font-weight: bold;
+        }
+
 
         /* MEDIA QUERIES FOR RESPONSIVE DESIGN */
 
@@ -193,6 +209,14 @@
 
                 <input type="submit" value="Send">
             </form>
+        </section>
+
+        <!-- API Section: Random quote from FreeAPI -->
+        <section id="quote-section">
+            <h2> Study Motivation Quote</h2>
+            <p id="quote-text">Loading quote...</p>
+            <p id="quote-author"></p>
+            <button type="button" id="new-quote">Get another quote</button>
         </section>
 
         <!-- DOM METHODS DEMO SECTION -->
@@ -409,6 +433,46 @@ document.getElementById("clear-done").addEventListener("click", () => {
 });
 
 updateTaskCount
+
+
+/* Fetching JSON Data from an API */
+const quoteText = document.getElementById("quote-text");
+const quoteAuthor = document.getElementById("quote-author");
+const newQuoteButton = document.getElementById("new-quote");
+
+const QUOTE_API_URL = "https://api.freeapi.app/api/v1/public/quotes/quote/random";
+
+async function getQuote() {
+    quoteText.textContent ="Loading quote...";
+    quoteAuthor.textContent = "";
+    newQuoteButton.disabled = true;
+
+    try {
+        const response = await fetch(QUOTE_API_URL);
+
+        if (!response.ok) {
+            throw new Error("Request failed with status " + response.status);
+        }
+
+        const json = await response.json();
+
+        const quote = json.data.content;
+        const author = json.data.author;
+
+        quoteText.textContent = "\u201C" + quote + "\u201D";
+        quoteAuthor.textContent = "- " + author;
+
+    } catch (error) {
+        quoteText.textContent = "Sorry, a quote couldn't be loaded right now";
+        console.error("Quote API error:", error);
+    } finally {
+        newQuoteButton.disabled = false;
+    }
+}
+
+getQuote();
+newQuoteButton.addEventListener("click", getQuote);
+
 
 </script>
 
