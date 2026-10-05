@@ -93,6 +93,15 @@
             border-radius: 4px;
         }
 
+        /* Smooth colour change when jQuery toggles the class */
+        body {
+            transition: background-color 0.6s ease;
+        }
+
+        body.dark-bg {
+            background-color: darkslateblue;
+        }
+
         #dom-demo {
             border: 2px solid white;
             border-radius: 8px;
@@ -225,7 +234,7 @@
             <p id="task-count">You have 0 tasks.</p>
 
             <label for="task-input">New task:</label><br>
-            <input typ="text" id="task-input" placeholder="e.g. Revise DOM methods">
+            <input type="text" id="task-input" placeholder="e.g. Revise DOM methods">
 
             <button type="button" id="add-task">Add tasks (bottom of list)</button>
             <button type="button" id="add-urgent">Add urgent task (top of list)</button>
@@ -239,30 +248,29 @@
 
     </main>
 
-<script>
-// 1. Simple greeting using variables, strings, and output
+<!--jQuery library-->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+<script>
+// 1. Simple greeting - jQuery document ready + create + css() + fadeIn
 let userName = "Visitor";
-document.addEventListener("DOMContentLoaded", () => {
-    const greeting = document.createElement("p");
-    greeting.textContent = "Hello " + userName + "! Welcome to my enhanced web app.";
-    greeting.style.textAlign = "center";
-    document.getElementById("main").appendChild(greeting);
+
+$(function () {
+    $("<p></p>")
+        .text("Hello " + userName + "! Welcome to my enhanced web app.")
+        .css("text-align", "center")
+        .hide()
+        .appendTo("#main")
+        .fadeIn(1500);
 });
 
-// 2. Button that changes background colour (functions and events)
-function changeColour() {
-    document.body.style.backgroundColor =
-        document.body.style.backgroundColor === "darkslateblue" ? "blueviolet" : "darkslateblue";
-}
-
-// Create the button dynamically
-const colourButton = document.createElement("button");
-colourButton.textContent = "Change Background Colour";
-colourButton.style.display = "block";
-colourButton.style.margin = "20px auto";
-colourButton.onclick = changeColour;
-document.getElementById("main").appendChild(colourButton);
+// 2. Button that changes background colour - jQuery create, css() set (object), toggleClass()
+$("<button type='button'>Change Background Colour</button>")
+    .css({ display: "block", margin: "20px auto" })
+    .on("click", function () {
+        $("body").toggleClass("dark-bg");
+    })
+    .appendTo("#main");
 
 // 3. Timer showing how long user has been on page (timers and variables)
 let seconds = 0;
@@ -289,77 +297,89 @@ for (let i = 0; i < cars.length; i++) {
 
 document.getElementById("main").appendChild(carList);
 
-// 5. Simple form validation (if conditions and errors)
-const form = document.querySelector("form");
+// 4b. Show/hide the car list - slideToggle() effect with callback
+$("<button type='button'>Hide car list</button>")
+    .insertBefore(carList)
+    .on("click", function () {
+        const $btn = $(this);
+        $(carList).slideToggle(400, function () {
+            // Callback: runs after animation finishes
+            $btn.text($(carList).is(":visible") ? "Hide car list" : "Show car list");
+        });
+    });
 
-form.addEventListener("submit", function(event) {
-    const name = document.getElementById("fname").value.trim();
-    const email = document.getElementById("email").value.trim();
+// 5. Simple form validation - jQuery selectors, val (), remove (), slideDown()
+$("form").on("submit", function (event) {
+    const name = $("#fname").val().trim();
+    const email = $("#email").val().trim();
 
-    // Remove any old error message before checking again
-    const oldError = document.getElementById("form-error");
-    if (oldError) {
-        oldError.remove();
-    }
+    // Remove any old error message
+    $("#form-error").remove();
 
     if (name === "" || email === "") {
         event.preventDefault();
-        
-        const errorMsg = document.createElement("p");
-        errorMsg.id = "form-error";
-        errorMsg.classList.add("error");
-        errorMsg.textContent = "Error: Please fill in both your name and email.";
-        form.insertBefore(errorMsg, form.firstChild); // puts error at top of the form
+
+        $("<p id='form-error' class='error'></p>")
+            .text("Error: Please fill in both your name and email.")
+            .hide()
+            .prependTo(this) // puts error at top of form
+            .slideDown(300);
     }
+
 });
 
 /* HTML DOM Methods */
 
 // Find every link except the skip link and makes each open safely in a new tab.
-const externalLinks = document.querySelectorAll("a:not(.skip-link)");
-externalLinks.forEach(link => {
-    link.setAttribute("target", "_blanl");
-    link.setAttribute("rel", "noopener noreferrer"); // security stops new tab controlling this page
+$("a:not(.skip-link)").attr({
+    target: "_blank",
+    rel: "noopener noreferrer" // security: stops new tab controlling this page
 });
 
-// getAttribute() + setAttribute() on the image
-const logo = document.querySelector("img");
-const sizeButton = document.createElement("button");
-sizeButton.type = "button";
-sizeButton.textContent = "Enlarge image";
+// Image resize - animate() with a callback, attr() get/set, width()/height() dimensions
+const $logo = $("img");
+const $sizeButton = $("<button type='button'>Enlarge image</button>").insertAfter($logo);
+const $sizeInfo = $("<p>Click the button to resize the image.</p>").insertAfter($sizeButton);
 
-logo.parentNode.insertBefore(sizeButton, logo.nextSibling);
+$sizeButton.on("click", function () {
+    const isSmall = $logo.width() < 150;
+    const newWidth = isSmall ? 208 : 104;
 
-sizeButton.addEventListener("click", () => {
-    const currentWidth = Number(logo.getAttribute("width"));
+    $sizeButton.prop("disabled", true);
 
-    if (currentWidth === 104) {
-        logo.setAttribute("width", "208");
-        logo.setAttribute("alt", "W3Schools Logo (enlarged)");
-        sizeButton.textContent = "Enlarge image";
-    }
+    $logo.animate({ width: newWidth }, 600, function () {
+        $logo.attr("alt", isSmall ? "W3Schools Logo (enlarged)" : "W3Schools Logo");
+        $sizeButton
+            .text(isSmall ? "Shrink image" : "Enlarge image")
+            .prop("disabled", false);
+        $sizeInfo.text("Image size: " + $logo.width() + " x " + Math.round($logo.height()) + "px");
+    });
 });
 
-// "Change" event + innerHTML + classList.toggle()
-const carSelect = document.getElementById("car");
-const carChoice = document.getElementById("car-choice");
+// "Change" event + html() + removeClass/addClass with chaining
+$("#car").on("change", function () {
+    const chosenText = $(this).find("option:selected").text();
 
-carSelect.addEventListener("change", () => {
-    const chosenText = carSelect.options[carSelect.selectedIndex].text;
+    $("#car-choice")
+        .html("You chose: <strong>" + chosenText + "</strong>")
+        .hide()
+        .fadeIn(400);
 
-    carChoice.innerHTML = "You choose: <strong>" + chosenText + "</strong";
-
-    for (const item of carList.children) {
-        item.classList.toggle("highlight", item.textContent === chosenText);
-    }
+    $(carList).children()
+    .removeClass("highlight")
+    .filter(function () {
+        return $(this).text() === chosenText;
+    })
+    .addClass("highlight");
 });
 
-// "input" event + textContent: live character counter
-const messageBox = document.getElementById("message");
-const charCount = document.getElementById("char-count");
+// "input" event + val() + text() + css(): live character counter
+$("#message").on("input", function () {
+    const length = $(this).val().length;
 
-messageBox.addEventListener("input", () => {
-    charCount.textContent = messageBox.value.length + " / 200 characters";
+    $("#char-count")
+        .text(length + " / 200 characters")
+        .css("color", length >= 180 ? "#ffff66" : "white");
 });
 
 // Study task list: creating, inserting, changing and removing elements
@@ -380,7 +400,7 @@ function createTask(text) {
     li.appendChild(document.createTextNode(text));
 
     const deleteBtn = document.createElement("button");
-    deleteBtn.type - "button";
+    deleteBtn.type = "button";
     deleteBtn.textContent = "Delete";
     deleteBtn.setAttribute("aria-label", "Delete tasks: " + text); 
     li.appendChild(deleteBtn);
@@ -394,13 +414,19 @@ function addTask(atTop) {
         taskInput.focus();
         return;
     }
-
-    const newTask = createTask(text);
+    
+    const $newTask = $(createTask(text)).hide();
 
     if (atTop) {
-        taskList.insertBefore(newTask, taskList.firstChild);
+        // Urgent: slide in, then flash using chained fadeTO() calls
+        $newTask.prependTo(taskList)
+            .slideDown(300)
+            .fadeTo(200, 0.3)
+            .fadeTo(200, 1, function () {
+                $(this).css("opacity", "")
+            });
     } else {
-    taskList.appendChild(newTask);
+        $newTask.appendTo(taskList).slideDown(300);
     }
 
     taskInput.value = "";
@@ -416,23 +442,28 @@ taskInput.addEventListener("keydown", (event) => {
     }
 });
 
-// Event delegation: One listener on the <ul> handles clicks on every task
-taskList.addEventListener("click", (event) => {
-    if (event.target.tagName === "BUTTON") {
-        const li = event.target.parentNode;
-        taskList.removeChild(li);
-    } else if (event.target.tagName === "LI") {
-        event.target.classList.toggle("done");
-    }
+// Event delegation with jQuery: on(event, childSelector, handler)
+$("#task-list").on("click", "button", function (event) {
+    event.stopPropagation();
+    $(this).parent().fadeOut(400, function () {
+        $(this).remove();
+        updateTaskCount();
+    });
+});
+
+$("#task-list").on("click", "li", function () {
+    $(this).toggleClass("done");
     updateTaskCount();
 });
 
-document.getElementById("clear-done").addEventListener("click", () => {
-    taskList.querySelectorAll(".done").forEach(task => task.remove());
-    updateTaskCount();
+$("#clear-done").on("click", function () {
+    $("#task-list .done").slideUp(300, function () {
+        $(this).remove();
+        updateTaskCount();
+    });
 });
 
-updateTaskCount
+updateTaskCount();
 
 
 /* Fetching JSON Data from an API */
@@ -461,6 +492,7 @@ async function getQuote() {
 
         quoteText.textContent = "\u201C" + quote + "\u201D";
         quoteAuthor.textContent = "- " + author;
+        $("#quote-text, #quote-author").hide().fadeIn(800);
 
     } catch (error) {
         quoteText.textContent = "Sorry, a quote couldn't be loaded right now";
